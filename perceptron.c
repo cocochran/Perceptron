@@ -11,7 +11,7 @@
 
 float dot_product(float x[][2], float *w, int n);
 int predict(float x[][2], float *w, int n);
-void train(float x[][2], float *w, float *b, int *y, float eta, int n);
+void train(float x[][2], float *w, float *b, int *y, float *eta, int n);
 void perceptron();
 
 
@@ -38,7 +38,7 @@ int main(){
     p.b = 0.0;
     p.eta = 0.1;
 
-    train(x, p.w, &p.b, y, p.eta, 50);
+    train(x, p.w, &p.b, y, &p.eta, 50);
     printf("W[0]=%f, W[1]=%f, b=%f, eta=%f", p.w[0], p.w[1], p.b, p.eta);
     return 0;
 }
@@ -56,13 +56,19 @@ int predict(float x[][2], float *w, int n){
     return dot_product(x, w, n) >= 0.0 ? 1 : -1;
 }
 
-void train(float x[][2], float *w, float *b, int *y, float eta, int n){
+void train(float x[][2], float *w, float *b, int *y, float *eta, int n){
+    fopen("/output/traing-log.txt", "w");
     for (int k = 0; k < n; k++){
         for (int i = 0; i < 4; i++){
             for (int j = 0; j < 2; j++){
-                w[j] = w[j] + eta * y[i] * x[i][j];
+		if (predict(x, w, n) == y[j]) return;
+                w[j] = w[j] + *eta * y[i] * x[i][j];
+
+		
             }
-            *b = *b + eta * y[i];
+            *b = *b + *eta * y[i];
+            printf("Epoch %d: w[0]=%f, w[1]=%f, b=%f, eta=%f\n", k, w[0], w[1], *b, *eta);
+
         }
     }
 }
